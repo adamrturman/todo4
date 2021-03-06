@@ -1,26 +1,57 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
 import './App.css';
+import ToDo from "./interfaces/ToDo";
+import InputArea from "./components/InputArea";
+import List from "./components/List";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+interface AppState {
+    list: ToDo[];
+};
 
-export default App;
+export default class App extends Component< {}, AppState> {
+    state = {
+        list: []
+    };
+
+    handleAddToList = (taskToAdd: string) => {
+        const toDoToAdd: ToDo = {
+            text: taskToAdd,
+            isCompleted: false
+        };
+        const listWithAddition = [...this.state.list, toDoToAdd];
+        this.setState({ list: listWithAddition });
+    }
+
+    handleDelete = (index: number) => {
+        const listWithDeletion = this.state.list.filter((toDo:ToDo, i: number) => {
+            if (i !== index) {
+                return toDo;
+            }
+            //  included on prompting from linter
+            return undefined;
+        });
+        this.setState({ list: listWithDeletion });
+    }
+
+    handleCompleted = (index: number) => {
+        const listWithCompletion: ToDo[] = this.state.list.map((toDo: ToDo, i: number) => {
+            if (i === index) {
+                toDo.isCompleted = !toDo.isCompleted;
+            }
+            return toDo;
+        })
+        this.setState({ list: listWithCompletion });
+    }
+
+    render() {
+        return (
+            <div className="App">
+                <h1>To Do List</h1>
+                <InputArea list={this.state.list} handleAddToList={this.handleAddToList}  />
+                <List list={this.state.list} handleDelete={this.handleDelete} handleCompleted={this.handleCompleted} />
+            </div>
+        );
+    };
+};
+
+
